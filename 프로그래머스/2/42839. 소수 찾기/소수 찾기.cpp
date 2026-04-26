@@ -1,51 +1,33 @@
 #include <string>
 #include <vector>
+#include <set>
+#include <cmath>
 #include <algorithm>
-#include <unordered_set>
-#include <iostream>
+
 using namespace std;
 
-unordered_set <int> table;
-unordered_set <int> answer;
-bool b[7] = { false };
-
-void f(int goal, int depth, string& numbers, string curNum)
-{
-    if (goal == depth)
-    {
-        if (table.end() != table.find(stoi(curNum))) { answer.insert(stoi(curNum)); }
-        return;
-    }
+bool isPrime(int n) {
+    if (n < 2) return false;
     
-    for(int i = 0; i < numbers.size(); ++i)
-    {
-        if (b[i] == true) continue;
-        if (depth == 0 && numbers[i] == '0') continue;
-        b[i] = true;
-        f(goal, depth + 1, numbers, curNum + numbers[i]);
-        b[i] = false;
+    for (int i = 2; i <= sqrt(n); ++i) {
+        if (n % i == 0) return false;
     }
+    return true;
 }
 
 int solution(string numbers) {
+    set<int> unique_nums;
     
-    sort(numbers.begin(), numbers.end(), greater<>());
+    sort(numbers.begin(), numbers.end());
     
-    int num = stoi(numbers);
-    vector<bool> v(num + 1, false);
+    do {
+        for (int i = 1; i <= numbers.size(); ++i)
+            unique_nums.insert(stoi(numbers.substr(0, i)));
+    } while (next_permutation(numbers.begin(), numbers.end()));
     
-    for(int i = 2; i <= num; ++i)
-    {
-        if (v[i] == false)
-        {
-            table.insert(i);
-            for(int j = 1; i * j <= num; ++j)
-                v[i * j] = true;
-        }
-    }
+    int answer = 0;
+    for (int num : unique_nums)
+        if (isPrime(num)) answer++; 
     
-    for(int i = 1; i <= numbers.size(); ++i)
-        f(i, 0, numbers, "");
-    
-    return answer.size();
+    return answer;
 }
