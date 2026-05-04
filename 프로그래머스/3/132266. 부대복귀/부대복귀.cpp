@@ -32,6 +32,7 @@ vector<int> solution(int n, vector<vector<int>> roads, vector<int> sources, int 
         q.pop();
     }
     
+    answer.reserve(sources.size());
     for(const auto & A : sources)
         answer.push_back(v[A]);
     
