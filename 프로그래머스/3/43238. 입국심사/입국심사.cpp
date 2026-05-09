@@ -5,23 +5,23 @@ using namespace std;
 
 long long solution(int n, vector<int> times) {
     long long answer = 0;
-    long long left = 1;
-    long long right = (long long)(*max_element(times.begin(), times.end())) * n;
+    long long start = 1;
+    long long end = (long long)(*max_element(times.begin(), times.end())) * n;
     
-    while(left <= right)
+    while(start <= end)
     {
-        long long mid = (left + right) >> 1;
-        long long p = 0;
+        long long mid = (end + start) >> 1;
+        long long acc = 0;
         
         for(const auto & A : times)
-            p += mid / (long long)A;
+            acc += mid / (long long)A;
         
-        if (p < n)
-            left = mid + 1;
-        else
+        if (acc < n)    //시간을 더 줘야함
+            start = mid + 1;
+        else            //시간을 더 줄여서 최적화
         {
+            end = mid - 1;
             answer = mid;
-            right = mid - 1;
         }
     }
     
