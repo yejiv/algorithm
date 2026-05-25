@@ -5,7 +5,6 @@ using namespace std;
 
 int solution(vector<vector<int>> data, int col, int row_begin, int row_end) {
     int answer = 0;
-    vector<int> S;
     
     sort(data.begin(), data.end(), [col](const vector<int> & v1, const vector<int> & v2)
     {
@@ -18,11 +17,8 @@ int solution(vector<vector<int>> data, int col, int row_begin, int row_end) {
         int sum = 0;
         for(const auto & A : data[i])
             sum += A % (i + 1);
-        S.push_back(sum);
+        answer ^= sum;
     }
     
-    for(const auto & A : S)
-        answer ^= A;
-        
     return answer;
 }
