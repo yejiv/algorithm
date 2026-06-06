@@ -13,12 +13,12 @@ bool f(string depart, int size)
 
     for(int i = 0; i < table[depart].size(); ++i)
     {
-        if (true == table[depart][i].second) continue;
+        if (table[depart][i].second) continue;
         
         table[depart][i].second = true;
         answer.push_back(table[depart][i].first);
         
-        if (true == f(table[depart][i].first, size)) return true;
+        if (f(table[depart][i].first, size)) return true;
         
         table[depart][i].second = false;
         answer.pop_back();
