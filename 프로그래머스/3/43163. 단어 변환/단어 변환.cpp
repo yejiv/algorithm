@@ -1,61 +1,57 @@
 #include <string>
 #include <vector>
 #include <queue>
-#include <iostream>
+#include <unordered_set>
+#include <unordered_map>
+
 using namespace std;
 
-bool check(const string & s1, const string & s2)
+bool check(string& s1, string& s2)
 {
     int count = 0;
     
-    for(int i = 0 ; i < s1.size(); ++i)
+    for(int i = 0; i < s1.size(); ++i)
         if (s1[i] != s2[i]) ++ count;
-
-    return count == 1;
+    
+    return (count > 1) ? false : true;
 }
 
 int solution(string begin, string target, vector<string> words) {
-    int answer = 0;
-    vector<vector<int>> table(words.size() + 1);
-    bool v[51] = {};
-    queue<pair<int, int>> q;
-    int target_idx = 0;
+    unordered_map<string, vector<string>> table;
+    queue<pair<string, int>> q;
+    unordered_set<string> v;
     
-    for(int i = 0; i < words.size(); ++i)
+    words.push_back(begin);
+    
+    for(int i = 0; i < words.size() - 1; ++i)
     {
-        if (check(begin, words[i]) == true)
-            table[0].push_back(i + 1);
-        if (words[i] == target)
-            target_idx = i + 1;
+        for(int j = i + 1; j < words.size(); ++j)
+        {
+            if (check(words[i], words[j]))
+            {
+                table[words[i]].push_back(words[j]);
+                table[words[j]].push_back(words[i]);
+            }
+        }
     }
-       
-    for(int i = 0; i < words.size(); ++i)
-        for(int j = 0; j < words.size(); ++j)
-            if (check(words[i], words[j]) == true)
-                table[i + 1].push_back(j + 1);
     
-    q.push({0, 0});
-    
+    q.push({begin, 0});
+
     while(!q.empty())
     {
-        int idx = q.front().first;
+        string s = q.front().first;
         int depth = q.front().second;
         q.pop();
+
+        if (s == target) return depth;
+        if (v.find(s) != v.end()) continue; //있다. 이미 방문.
         
-        if (idx == target_idx)
-        {
-            answer = depth; break;
-        }
+        v.insert(s);
         
-        if (v[idx]) continue;
-        
-        v[idx] = true;
-        
-        for(int i = 0; i < table[idx].size(); ++i)
-            if (!v[table[idx][i]])
-                q.push({table[idx][i], depth + 1});
-            
+        for(const auto & A : table[s])
+            if (v.find(A) == v.end()) 
+                q.push({A, depth + 1});
     }
-    
-    return answer;
+
+    return 0;
 }
