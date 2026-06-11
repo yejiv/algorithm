@@ -1,10 +1,10 @@
 #include <string>
 #include <vector>
-#include <set>
+#include <unordered_set>
 using namespace std;
 
 int solution(vector<int> elements) {
-    set<int> s;
+    unordered_set<int> s;
     
     for(int size = 1; size <= elements.size(); ++size)
     {
