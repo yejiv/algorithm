@@ -4,10 +4,9 @@ using namespace std;
 
 vector<double> solution(int k, vector<vector<int>> ranges) {
     vector<double> answer;
-    vector<double> graph;
+    double prev_node = k;
     vector<double> acc_sum;
     
-    graph.push_back(k);
     acc_sum.push_back(0);
     
     while(k > 1)
@@ -17,8 +16,8 @@ vector<double> solution(int k, vector<vector<int>> ranges) {
         else
             k = k * 3 + 1;
                 
-        acc_sum.push_back(acc_sum.back() + ((graph.back() + k) / 2));
-        graph.push_back(k);
+        acc_sum.push_back(acc_sum.back() + ((prev_node + k) / 2));
+        prev_node = k;
     }
     
     for(const auto & r : ranges)
