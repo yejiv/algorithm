@@ -4,91 +4,98 @@
 
 using namespace std;
 
-int dy[4] = {-1, 1, 0, 0};
-int dx[4] = {0, 0, -1, 1};
-
-void Crane(vector<string>& board, char target, int& answer) 
+void TakeOut_crane(vector<string>& storage, char target, int& answer)
 {
-    int height = board.size();
-    int width = board[0].size();
+    int height = storage.size();
+    int width = storage[0].size();
     
-    for (int i = 1; i < height - 1; ++i) {
-        for (int j = 1; j < width - 1; ++j) {
-            if (board[i][j] == target) {
-                board[i][j] = '.';
-                answer--;
+    for(int i = 0; i < height; ++i)
+    {
+        for(int j = 0; j < width; ++j)
+        {
+            if (target == storage[i][j])
+            {
+                -- answer;
+                storage[i][j] = '0';
             }
         }
     }
 }
 
-void Forklift(vector<string>& board, char target, int& answer) {
-    int height = board.size();
-    int width = board[0].size();
+void TakeOut_Forklift(vector<string>& storage, char target, int& answer)
+{
+    int height = storage.size();
+    int width = storage[0].size();
     
-    vector<vector<bool>> visited(height, vector<bool>(width, false));
+    int dx[4] = { -1, 1, 0, 0};
+    int dy[4] = { 0, 0, -1, 1};
+    
     queue<pair<int, int>> q;
-    vector<pair<int, int>> to_remove; 
+    bool visit[52][52] = {};
+    vector<pair<int, int>> e;
     
-    q.push({0, 0});
-    visited[0][0] = true;
+    q.push({0,0});
+    visit[0][0] = true;
     
-    while (!q.empty()) 
+    while(!q.empty())
     {
-        int y = q.front().first;
-        int x = q.front().second;
+        int cur_y = q.front().first;
+        int cur_x = q.front().second;
         q.pop();
         
-        for (int i = 0; i < 4; ++i) {
-            int ny = y + dy[i];
-            int nx = x + dx[i];
+        if (storage[cur_y][cur_x] != '0')
+        {
+            if (storage[cur_y][cur_x] == target)
+                e.push_back({cur_y, cur_x});
+            continue;
+        }
             
-            if (ny < 0 || nx < 0 || ny >= height || nx >= width) continue;
-            if (visited[ny][nx]) continue;
+        for(int k = 0; k < 4; ++k)
+        {
+            int nx = cur_x + dx[k];
+            int ny = cur_y + dy[k];
             
-            if (board[ny][nx] == '.') 
-            {
-                visited[ny][nx] = true;
-                q.push({ny, nx});
-            } 
+            if (nx < 0 || ny < 0 || nx >= width || ny >= height || visit[ny][nx]) continue;
             
-            else if (board[ny][nx] == target) 
-            {
-                // 외부와 맞닿아 있는 타겟을 발! (큐에 넣지는 않고 삭제 목록에만 추가)
-                visited[ny][nx] = true; 
-                to_remove.push_back({ny, nx});
-            }
+            visit[ny][nx] = true;
+            q.push({ny, nx});
         }
     }
-    
-    for (const auto& pos : to_remove) 
+   
+    for(const auto & p : e)
     {
-        board[pos.first][pos.second] = '.';
-        answer--;
+        storage[p.first][p.second] = '0';
+        --answer;
     }
 }
 
-int solution(vector<string> storage, vector<string> requests) {
+void MakePadding(vector<string>& src, vector<string>& dst)
+{
+    string s = "";
+    for(int i = 0; i < src[0].size() + 2; ++i)
+        s += '0';
+    
+    dst.push_back(s);
+    
+    for(const string & old : src)
+        dst.push_back("0" + old + "0");
+    
+    dst.push_back(s);
+}
+
+int solution(vector<string> storage, vector<string> requests) 
+{
     int answer = storage.size() * storage[0].size();
+    vector<string> s;
     
-    int height = storage.size() + 2;
-    int width = storage[0].size() + 2;
-    vector<string> board(height, string(width, '.'));
-    
-    for (int i = 0; i < storage.size(); ++i) 
+    MakePadding(storage, s);
+
+    for(const auto & r : requests)
     {
-        for (int j = 0; j < storage[0].size(); ++j) 
-        {
-            board[i + 1][j + 1] = storage[i][j];
-        }
-    }
-    
-    for (const string& req : requests) 
-    {
-        if (req.size() == 2) 
-            Crane(board, req[0], answer);
-        else 
-            Forklift(board, req[0], answer);
+        if (r.size() > 1)
+            TakeOut_crane(s, r[0], answer);
+        else
+            TakeOut_Forklift(s, r[0], answer);
     }
     
     return answer;
